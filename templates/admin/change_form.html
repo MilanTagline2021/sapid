@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %} {% load static %} {% block extrahead %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (window.location.href.indexOf("restaurantaddexcel") > -1) {
+            $('input[name="_save"]').val('Upload')
+            $('input[name="_continue"]').hide();
+        }
+    });
+</script>
+{% endblock %}

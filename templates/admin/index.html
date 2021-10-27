@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'admin/home.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="dashboard-data">
+
+        <table class="table" id="total_data">
+            <thead>
+                <tr>
+                    <th>Total Users</th>
+                    <th>Total Saves</th>
+                    <th>Total Likes</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // ajax to list only parent categories while creating sub categories
+        console.log('index page')
+        $.ajax({
+            type: "GET",
+            url: "/api/total-data/",
+            success: function (data) {
+
+                total_users = data['total_users']
+                total_saves = data['total_saves']
+                total_favourites = data['total_favourites']
+
+                row = "<tr><td> " + total_users + " </td><td> " + total_saves + " </td><td> " +
+                    total_favourites + " </td></tr> "
+                $("#total_data tbody").append(row);
+            }
+        })
+    });
+</script>
+{% endblock %}

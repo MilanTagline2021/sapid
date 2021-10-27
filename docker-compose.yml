@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5438:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data:cached
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8020
+    volumes:
+      - .:/code
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    ports:
+      - "8020:8020"
+    environment:
+      DB_NAME: ${DB_NAME} 
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      USE_S3: ${USE_S3}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME}
+    depends_on:
+      - postgres
+      - redis
+    links:
+      - postgres
+
+  redis:
+    image: "redis:alpine"
+
+  celery:
+    build: .
+    command: celery -A sapid worker -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A sapid beat -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+      
+
+volumes:
+  db-data:
+  static_volume:
+  media_volume:
